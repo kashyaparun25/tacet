@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tacet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,600..800,35,0..1&family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="/assets/tacet-logo.png" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div id="toastRegion" class="toast-region" aria-live="assertive" aria-atomic="true"></div>
+
+    <main class="app-shell">
+      <header class="app-header">
+        <div class="brand-lockup">
+          <img class="brand-mark" src="/assets/tacet-logo.png" alt="" />
+          <div>
+            <p class="brand-kicker">Realtime captions</p>
+            <h1>Tacet</h1>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <div class="status-chip" data-status="connection">
+            <span>Connection</span>
+            <strong id="connectionStatus">Idle</strong>
+          </div>
+          <div class="status-chip">
+            <span>Mode</span>
+            <strong id="modeBadge">Online</strong>
+          </div>
+          <div class="status-chip">
+            <span>Blocks</span>
+            <strong id="blockCount">0</strong>
+          </div>
+          <button id="historyButton" class="icon-button" type="button" aria-label="Open history" title="History">
+            <span class="button-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8" />
+                <path d="M12 7v5l3.5 2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+          </button>
+          <button id="helpButton" class="icon-button" type="button" aria-label="Replay welcome tour" title="Replay tour">
+            <span class="button-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8" />
+                <path d="M9.6 9.4a2.5 2.5 0 0 1 4.8.7c0 1.6-2.1 1.9-2.4 3.1M12 17h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+          </button>
+          <button id="settingsButton" class="icon-button" type="button" aria-label="Open settings" title="Settings">
+            <span class="button-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8" />
+                <path d="M19.4 13.6a7.7 7.7 0 0 0 0-3.2l1.7-1.3-1.5-2.6-2 .7a7.7 7.7 0 0 0-2.8-1.6L14.5 3h-3l-.4 2.6a7.7 7.7 0 0 0-2.8 1.6l-2-.7L4.9 9.1l1.7 1.3a7.7 7.7 0 0 0 0 3.2L4.9 14.9l1.5 2.6 2-.7a7.7 7.7 0 0 0 2.8 1.6l.4 2.6h3l.4-2.6a7.7 7.7 0 0 0 2.8-1.6l2 .7 1.5-2.6Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+              </svg>
+            </span>
+          </button>
+          <button id="copyAllButton" class="icon-button with-label" type="button" aria-label="Copy all transcript blocks">
+            <span class="button-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M8 8h10v12H8zM5 4h10v3H8v9H5z" />
+              </svg>
+            </span>
+            <span class="button-label">Copy all</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="workspace">
+        <aside class="control-rail" aria-label="Capture controls">
+          <div class="mode-card">
+            <p class="mode-card-kicker">Engine</p>
+            <div class="mode-toggle" role="group" aria-label="Transcription engine">
+              <button id="modeOnlineButton" class="mode-toggle-button" type="button" aria-pressed="true">
+                <strong>Online</strong>
+                <small>Deepgram cloud</small>
+              </button>
+              <button id="modeOfflineButton" class="mode-toggle-button" type="button" aria-pressed="false">
+                <strong>Offline</strong>
+                <small>On-device Nemotron</small>
+              </button>
+            </div>
+
+            <div id="offlinePanel" class="offline-panel" hidden>
+              <div class="offline-status">
+                <strong id="offlineStatusLabel">Checking model...</strong>
+                <small id="offlineStatusDetail"></small>
+              </div>
+              <div id="offlineProgressTrack" class="offline-progress-track" data-state="idle">
+                <div id="offlineProgressBar" class="offline-progress-bar"></div>
+              </div>
+              <div class="offline-actions">
+                <button id="offlineDownloadButton" class="offline-button primary" type="button" hidden>
+                  Download model
+                </button>
+                <button id="offlineCancelButton" class="offline-button ghost" type="button" hidden>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="signal-card">
+            <p>Capture mix</p>
+            <strong>Local audio in. Clean transcript out.</strong>
+          </div>
+
+          <div class="source-card">
+            <button id="micButton" class="source-button" type="button" aria-pressed="false">
+              <span class="source-copy">
+                <span class="source-glyph" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <path d="M12 3a3 3 0 0 0-3 3v5a3 3 0 1 0 6 0V6a3 3 0 0 0-3-3Z" />
+                    <path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v3M8 21h8" />
+                  </svg>
+                </span>
+                <span>
+                  <strong>Microphone</strong>
+                  <small id="micStatus">Off</small>
+                </span>
+              </span>
+              <span class="toggle-track" aria-hidden="true">
+                <span class="toggle-thumb"></span>
+              </span>
+            </button>
+
+            <button id="systemButton" class="source-button" type="button" aria-pressed="false">
+              <span class="source-copy">
+                <span class="source-glyph" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4" />
+                  </svg>
+                </span>
+                <span>
+                  <strong>System</strong>
+                  <small id="systemStatus">Off</small>
+                </span>
+              </span>
+              <span class="toggle-track" aria-hidden="true">
+                <span class="toggle-thumb"></span>
+              </span>
+            </button>
+          </div>
+
+          <div class="transport-card">
+            <button id="startButton" class="transport-button primary-button" type="button" aria-label="Start captions" title="Start captions">
+              <span class="button-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M8 5v14l11-7Z" />
+                </svg>
+              </span>
+            </button>
+            <button id="stopButton" class="transport-button secondary-button" type="button" disabled aria-label="Stop captions" title="Stop captions">
+              <span class="button-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M7 7h10v10H7z" />
+                </svg>
+              </span>
+            </button>
+            <button id="clearButton" class="transport-button ghost-button" type="button" aria-label="Clear transcript" title="Clear transcript">
+              <span class="button-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+                </svg>
+              </span>
+            </button>
+          </div>
+
+          <div class="note-card">
+            <p>macOS captures system audio through Screen & System Audio Recording. If it stops, re-enable Electron in Privacy settings and relaunch.</p>
+          </div>
+        </aside>
+
+        <section class="conversation-panel" aria-label="Transcript">
+          <div class="conversation-header">
+            <div>
+              <p id="conversationKicker" class="section-kicker">Live room</p>
+              <h2 id="conversationTitle">Transcript</h2>
+            </div>
+            <div id="conversationWave" class="header-wave" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <button id="backToLiveButton" class="icon-button with-label" type="button" hidden>
+              <span class="button-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
+              <span class="button-label">Back to live</span>
+            </button>
+            <button id="copyLiveButton" class="icon-button" type="button" aria-label="Copy current utterance">
+              <span class="button-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M8 8h10v12H8zM5 4h10v3H8v9H5z" />
+                </svg>
+              </span>
+            </button>
+          </div>
+
+          <div id="transcriptFeed" class="transcript-feed" aria-live="polite"></div>
+
+          <div class="live-composer" aria-label="Current utterance">
+            <div class="pulse-dot" aria-hidden="true"></div>
+            <p id="interimLine">Waiting for audio...</p>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

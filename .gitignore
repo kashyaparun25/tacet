@@ -1,0 +1,42 @@
+# Dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build output
+dist
+release
+out
+
+# Tacet runtime data
+.models
+.sessions
+*.part
+
+# Test artifacts
+.playwright-cli
+.playwright-mcp
+test-results
+playwright-report
+
+# Editor
+.vscode
+.idea
+*.swp
+*.swo
+
+# Logs
+logs
+*.log
+
+# Local tooling
+.claude

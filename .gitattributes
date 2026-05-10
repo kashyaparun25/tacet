@@ -1,0 +1,12 @@
+# Normalize line endings on commit
+* text=auto eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.ico binary
+*.onnx binary
+*.bin binary
+*.dylib binary
+*.dll binary
+*.so binary
